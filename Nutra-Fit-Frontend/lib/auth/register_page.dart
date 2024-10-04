@@ -14,8 +14,13 @@ class _RegisterPageState extends State<RegisterPage> {
   String _username = '';
   String _email = '';
   String _password = '';
+  bool _isLoading = false; // Loading state
 
   Future<void> register() async {
+    setState(() {
+      _isLoading = true; // Show loading indicator
+    });
+
     const url = 'http://127.0.0.1:5000/register';
     final response = await http.post(
       Uri.parse(url),
@@ -27,6 +32,10 @@ class _RegisterPageState extends State<RegisterPage> {
       }),
     );
 
+    setState(() {
+      _isLoading = false; // Hide loading indicator
+    });
+
     if (response.statusCode == 201) {
       // Registration success
       ScaffoldMessenger.of(context).showSnackBar(
@@ -35,8 +44,16 @@ class _RegisterPageState extends State<RegisterPage> {
       Navigator.pop(context); // Return to login page
     } else {
       // Registration failed
+      String message;
+      try {
+        final data = jsonDecode(response.body);
+        message = data['message'] ??
+            'Registration failed!'; // Use message from server
+      } catch (e) {
+        message = 'Registration failed!'; // Default message if parsing fails
+      }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registration failed!')),
+        SnackBar(content: Text(message)),
       );
     }
   }
@@ -100,15 +117,21 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    register();
-                  }
-                },
+                onPressed: _isLoading
+                    ? null // Disable button while loading
+                    : () {
+                        if (_formKey.currentState!.validate()) {
+                          register();
+                        }
+                      },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF7ED957), // Button color
                 ),
-                child: const Text('Register'),
+                child: _isLoading
+                    ? const CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      )
+                    : const Text('Register'),
               ),
             ],
           ),

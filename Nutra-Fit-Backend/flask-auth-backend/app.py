@@ -96,7 +96,7 @@ def profile():
         return jsonify({"message": "User not found!"}), 404
 
 # Create Diet Plan
-@app.route('/diet-plan', methods=['POST'])
+@app.route('/create-diet-plan', methods=['POST'])
 @jwt_required()
 def create_diet_plan():
     current_user_id = get_jwt_identity()
@@ -106,6 +106,8 @@ def create_diet_plan():
         return jsonify({"message": "User not found"}), 404
 
     data = request.get_json()
+    print(data)  # Debugging to check if data is received correctly
+
     weight = data.get('weight')
     height = data.get('height')
     objective = data.get('objective')
@@ -128,6 +130,32 @@ def create_diet_plan():
     db.session.commit()
 
     return jsonify({"message": "Diet plan created successfully!"}), 201
+
+# display diet plan
+
+# Get Diet Plan for Current User
+@app.route('/diet-plan', methods=['GET'])
+@jwt_required()
+def get_diet_plan():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    
+    if user:
+        diet_plan = DietPlan.query.filter_by(user_id=current_user_id).first()
+        if diet_plan:
+            return jsonify({
+                'weight': diet_plan.weight,
+                'height': diet_plan.height,
+                'objective': diet_plan.objective,
+                'work_category': diet_plan.work_category,
+                'gender': diet_plan.gender
+            }), 200
+        else:
+            return jsonify({"message": "No diet plan found"}), 404
+    else:
+        return jsonify({"message": "User not found"}), 404
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

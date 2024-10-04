@@ -18,34 +18,45 @@ class _LoginPageState extends State<LoginPage> {
   String _password = '';
 
   Future<void> login() async {
-    const url = 'http://127.0.0.1:5000/login'; // Replace with your backend URL
-    final response = await http.post(
-      Uri.parse(url),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        'email': _email,
-        'password': _password,
-      }),
-    );
+    if (_formKey.currentState!.validate()) {
+      try {
+        const url =
+            'http://127.0.0.1:5000/login'; // Replace with your backend URL
+        final response = await http.post(
+          Uri.parse(url),
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode({
+            'email': _email,
+            'password': _password,
+          }),
+        );
 
-// After successful login
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(
-          'access_token', data['access_token']); // Store the token
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login successful!')),
-      );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => DashboardPage()),
-      );
-    } else {
-      // Login failed
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login failed!')),
-      );
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString(
+              'access_token', data['access_token']); // Store the token
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Login successful!')),
+          );
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const DashboardPage()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Login failed! Please check your credentials.'),
+            ),
+          );
+        }
+      } catch (error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('An error occurred: $error')),
+        );
+      }
     }
   }
 
@@ -73,6 +84,8 @@ class _LoginPageState extends State<LoginPage> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter an email';
+                  } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                    return 'Please enter a valid email';
                   }
                   return null;
                 },
@@ -94,11 +107,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    login();
-                  }
-                },
+                onPressed: login, // Directly call the login function
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF7ED957), // Button color
                 ),
@@ -110,13 +119,11 @@ class _LoginPageState extends State<LoginPage> {
                   // Navigate to the registration page
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => RegisterPage()),
+                    MaterialPageRoute(
+                        builder: (context) => const RegisterPage()),
                   );
                 },
-                child: const Text('Don\'t have an account? Register here'),
-                // style: TextButton.styleFrom(
-                //   backgroundColor: Color(0xFF7ED957), // Text color
-                // ),
+                child: const Text("Don't have an account? Register here"),
               ),
             ],
           ),

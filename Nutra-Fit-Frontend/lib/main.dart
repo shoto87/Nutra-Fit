@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:login_flask/pages/diet_menu_screen.dart';
 import './auth/login_page.dart';
 import './pages/dashboard.dart';
 
@@ -20,6 +21,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => LoginPage(),
         '/dashboard': (context) => DashboardPage(),
+        '/diet-menu': (context) => DietMenuScreen(),
       },
     );
   }

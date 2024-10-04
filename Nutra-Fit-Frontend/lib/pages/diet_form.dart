@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DietFormScreen extends StatefulWidget {
-  const DietFormScreen({super.key});
+  const DietFormScreen({Key? key}) : super(key: key);
 
   @override
   State<DietFormScreen> createState() => _DietFormScreenState();
@@ -11,16 +12,12 @@ class DietFormScreen extends StatefulWidget {
 
 class _DietFormScreenState extends State<DietFormScreen> {
   final _formKey = GlobalKey<FormState>();
-
-  // Controllers to handle form input
   final TextEditingController _weightController = TextEditingController();
   final TextEditingController _heightController = TextEditingController();
-
   String? _gender;
   String? _objective;
   String? _workCategory;
 
-  // Dropdown values for gender, objective, and work category
   final List<String> _genders = ['Male', 'Female', 'Other'];
   final List<String> _objectives = [
     'Weight Loss',
@@ -34,152 +31,170 @@ class _DietFormScreenState extends State<DietFormScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Diet Planner Form'),
+        backgroundColor: const Color(0xFF7ed957), // Set app bar color
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              // Weight input
-              TextFormField(
-                controller: _weightController,
-                decoration: const InputDecoration(labelText: 'Weight (kg)'),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your weight';
-                  }
-                  return null;
-                },
-              ),
-
-              // Height input
-              TextFormField(
-                controller: _heightController,
-                decoration: const InputDecoration(labelText: 'Height (cm)'),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your height';
-                  }
-                  return null;
-                },
-              ),
-
-              // Gender dropdown
-              DropdownButtonFormField<String>(
-                value: _gender,
-                decoration: const InputDecoration(labelText: 'Gender'),
-                items: _genders.map((String gender) {
-                  return DropdownMenuItem<String>(
-                    value: gender,
-                    child: Text(gender),
-                  );
-                }).toList(),
-                onChanged: (newValue) {
-                  setState(() {
-                    _gender = newValue;
-                  });
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select your gender';
-                  }
-                  return null;
-                },
-              ),
-
-              // Objective dropdown
-              DropdownButtonFormField<String>(
-                value: _objective,
-                decoration: const InputDecoration(labelText: 'Objective'),
-                items: _objectives.map((String objective) {
-                  return DropdownMenuItem<String>(
-                    value: objective,
-                    child: Text(objective),
-                  );
-                }).toList(),
-                onChanged: (newValue) {
-                  setState(() {
-                    _objective = newValue;
-                  });
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select your objective';
-                  }
-                  return null;
-                },
-              ),
-
-              // Work category dropdown
-              DropdownButtonFormField<String>(
-                value: _workCategory,
-                decoration: const InputDecoration(labelText: 'Work Category'),
-                items: _workCategories.map((String category) {
-                  return DropdownMenuItem<String>(
-                    value: category,
-                    child: Text(category),
-                  );
-                }).toList(),
-                onChanged: (newValue) {
-                  setState(() {
-                    _workCategory = newValue;
-                  });
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select your work category';
-                  }
-                  return null;
-                },
-              ),
-
-              const SizedBox(height: 20),
-
-              // Submit button
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    // Handle form submission
-                    _submitForm();
-                  }
-                },
-                child: const Text('Submit'),
+      body: Center(
+        // Center the entire content
+        child: Container(
+          padding: const EdgeInsets.all(20.0), // Padding around the container
+          decoration: BoxDecoration(
+            color: Colors.white, // Background color of the box
+            borderRadius: BorderRadius.circular(15.0), // Rounded corners
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 3,
+                blurRadius: 5,
+                offset: const Offset(0, 3), // changes position of shadow
               ),
             ],
+          ),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize:
+                  MainAxisSize.min, // Minimize the height of the column
+              children: [
+                _buildTextFormField(_weightController, 'Weight (kg)',
+                    'Please enter your weight'),
+                _buildTextFormField(_heightController, 'Height (cm)',
+                    'Please enter your height'),
+                _buildDropdownFormField<String>(
+                  _gender,
+                  'Gender',
+                  _genders,
+                  (newValue) => setState(() => _gender = newValue),
+                  'Please select your gender',
+                ),
+                _buildDropdownFormField<String>(
+                  _objective,
+                  'Objective',
+                  _objectives,
+                  (newValue) => setState(() => _objective = newValue),
+                  'Please select your objective',
+                ),
+                _buildDropdownFormField<String>(
+                  _workCategory,
+                  'Work Category',
+                  _workCategories,
+                  (newValue) => setState(() => _workCategory = newValue),
+                  'Please select your work category',
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _submitForm,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF7ed957), // Button color
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 15.0, horizontal: 20.0),
+                  ),
+                  child: const Text(
+                    'Submit',
+                    style: TextStyle(color: Colors.white), // Button text color
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  void _submitForm() async {
-    final weight = _weightController.text;
-    final height = _heightController.text;
-    final gender = _gender;
-    final objective = _objective;
-    final workCategory = _workCategory;
+  Widget _buildTextFormField(
+      TextEditingController controller, String label, String errorMessage) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Color(0xFF7ed957)), // Label color
+        focusedBorder: UnderlineInputBorder(
+          borderSide: const BorderSide(
+              color: Color(0xFF7ed957)), // Focused border color
+        ),
+      ),
+      keyboardType: TextInputType.number,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return errorMessage;
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildDropdownFormField<T>(
+    T? value,
+    String label,
+    List<String> items,
+    void Function(T?) onChanged,
+    String errorMessage,
+  ) {
+    return DropdownButtonFormField<T>(
+      value: value,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Color(0xFF7ed957)), // Label color
+        focusedBorder: UnderlineInputBorder(
+          borderSide: const BorderSide(
+              color: Color(0xFF7ed957)), // Focused border color
+        ),
+      ),
+      items: items.map((String item) {
+        return DropdownMenuItem<T>(
+          value: item as T,
+          child: Text(item),
+        );
+      }).toList(),
+      onChanged: onChanged,
+      validator: (value) {
+        if (value == null) {
+          return errorMessage;
+        }
+        return null;
+      },
+    );
+  }
+
+  Future<void> createDietPlan() async {
+    const url = 'http://127.0.0.1:5000/create-diet-plan'; // Updated endpoint
+
+    // Fetch JWT token
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token =
+        prefs.getString('jwt_token'); // Ensure you store the token after login
 
     final response = await http.post(
-      Uri.parse('http://127.0.0.1:5000/submit_form'),
-      headers: <String, String>{
-        'Content-Type': 'application/json',
+      Uri.parse(url),
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization':
+            'Bearer $token', // Use the valid token from shared preferences
       },
-      body: jsonEncode(<String, String>{
-        'weight': weight,
-        'height': height,
-        'gender': gender!,
-        'objective': objective!,
-        'work_category': workCategory!,
+      body: jsonEncode({
+        'weight': _weightController.text,
+        'height': _heightController.text,
+        'objective': _objective,
+        'work_category': _workCategory,
+        'gender': _gender,
       }),
     );
 
     if (response.statusCode == 201) {
-      print('Form data saved successfully');
+      print('Diet plan created successfully');
+      Navigator.pushReplacementNamed(context, '/diet-menu');
     } else {
-      print('Failed to save data');
+      print('Failed to save data: ${response.body}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to save data: ${response.body}')),
+      );
+    }
+  }
+
+  void _submitForm() async {
+    if (_formKey.currentState!.validate()) {
+      // Call the createDietPlan method to handle the HTTP request
+      await createDietPlan();
     }
   }
 
