@@ -74,7 +74,9 @@ Nutra Fit Diet Planner is a personalized diet management app that helps users cr
 
    ```
 
-8. **Navigate to the frontend directory**:
+8. **Open new terminal without closing backend server !!!**
+
+9. **Navigate to the frontend directory**:
 
    ```bash
    cd ../../Nutra-Fit-Frontend
@@ -83,7 +85,8 @@ Nutra Fit Diet Planner is a personalized diet management app that helps users cr
 
    ```
 
-9. **Run the Flutter app**:
-   ```bash
-   flutter run
-   ```
+10. **Run the Flutter app**:
+
+```bash
+flutter run
+```
