@@ -19,49 +19,71 @@ Nutra Fit Diet Planner is a personalized diet management app that helps users cr
 ## Installation
 
 1. **Clone the repository**:
+
    ```bash
    git clone `https://github.com/shoto87/Nutra-Fit.git`
 
+   ```
+
 2. **Navigate to the project directory**:
+
    ```bash
    cd Nutra-Fit
 
+   ```
+
 3. **Create a virtual environment (if using Python3 else just replace with python)**:
+
    ```bash
    python3 -m venv env
 
+   ```
+
 4. **Activate the virtual environment**:
 
-
    - **On Windows**:
+
    ```bash
      env\Scripts\activate
    ```
 
-
    - **On Linux**:
+
    ```bash
      source env/bin/activate
    ```
 
 5. **Navigate to the backend directory**:
+
    ```bash
    cd Nutra-Fit-Backend/flask-auth-backend
 
+   ```
+
 6. **Install backend dependencies**:
+
    ```bash
    pip install -r requirements.txt
 
+   ```
+
 7. **Run the backend server**:
+
    ```bash
    python3 app.py  # or your main Flask file
 
+   ```
+
 8. **Navigate to the frontend directory**:
+
    ```bash
-   cd ../Nutra-Fit-Frontend
+   cd ../../Nutra-Fit-Frontend
 
    #or just run the main file f5 or fn+f5
+
+   ```
 
 9. **Run the Flutter app**:
    ```bash
    flutter run
+   ```
