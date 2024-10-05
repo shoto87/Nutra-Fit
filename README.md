@@ -32,7 +32,7 @@ Nutra Fit Diet Planner is a personalized diet management app that helps users cr
 
    ```
 
-3. **Create a virtual environment (if using Python3 else just replace with python)**:
+3. **Create a virtual environment (if using Python else just replace with python)**:
 
    ```bash
    python3 -m venv env
