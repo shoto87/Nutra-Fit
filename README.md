@@ -60,6 +60,8 @@ Nutra Fit Diet Planner is a personalized diet management app that helps users cr
    ```bash
    cd ../Nutra-Fit-Frontend
 
+   #or just run the main file f5 or fn+f5
+
 9. **Run the Flutter app**:
    ```bash
    flutter run
