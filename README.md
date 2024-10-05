@@ -26,7 +26,7 @@ Nutra Fit Diet Planner is a personalized diet management app that helps users cr
    ```bash
    cd Nutra-Fit
 
-3. **Create a virtual environment (if using Python)**:
+3. **Create a virtual environment (if using Python3 else just replace with python)**:
    ```bash
    python3 -m venv env
 
