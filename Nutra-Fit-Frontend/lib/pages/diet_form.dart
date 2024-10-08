@@ -33,95 +33,163 @@ class _DietFormScreenState extends State<DietFormScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Diet Plan Form'),
-        backgroundColor: Colors.green,
+        backgroundColor: const Color(0xFF7ed957),
       ),
-      body: Padding(
+      body: Container(
+        color: const Color(0xFFccffb6),
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _weightController,
-                decoration: InputDecoration(labelText: 'Weight (kg)'),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your weight';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _heightController,
-                decoration: InputDecoration(labelText: 'Height (cm)'),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your height';
-                  }
-                  return null;
-                },
-              ),
-              DropdownButtonFormField<String>(
-                value: _gender,
-                decoration: InputDecoration(labelText: 'Gender'),
-                items: _genders.map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (newValue) {
-                  setState(() {
-                    _gender = newValue;
-                  });
-                },
-                validator: (value) =>
-                    value == null ? 'Please select your gender' : null,
-              ),
-              DropdownButtonFormField<String>(
-                value: _objective,
-                decoration: InputDecoration(labelText: 'Objective'),
-                items: _objectives.map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (newValue) {
-                  setState(() {
-                    _objective = newValue;
-                  });
-                },
-                validator: (value) =>
-                    value == null ? 'Please select your objective' : null,
-              ),
-              DropdownButtonFormField<String>(
-                value: _workCategory,
-                decoration: InputDecoration(labelText: 'Work Category'),
-                items: _workCategories.map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (newValue) {
-                  setState(() {
-                    _workCategory = newValue;
-                  });
-                },
-                validator: (value) =>
-                    value == null ? 'Please select your work category' : null,
-              ),
-              const SizedBox(height: 20),
-              _isLoading
-                  ? CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: _submitForm,
-                      child: const Text('Submit'),
+        child: SingleChildScrollView(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextFormField(
+                          controller: _weightController,
+                          decoration: InputDecoration(
+                            labelText: 'Weight (kg)',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
+                          keyboardType: TextInputType.number,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your weight';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16.0),
+                        TextFormField(
+                          controller: _heightController,
+                          decoration: InputDecoration(
+                            labelText: 'Height (cm)',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
+                          keyboardType: TextInputType.number,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your height';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16.0),
+                        DropdownButtonFormField<String>(
+                          value: _gender,
+                          decoration: InputDecoration(
+                            labelText: 'Gender',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
+                          items: _genders.map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (newValue) {
+                            setState(() {
+                              _gender = newValue;
+                            });
+                          },
+                          validator: (value) => value == null
+                              ? 'Please select your gender'
+                              : null,
+                        ),
+                        const SizedBox(height: 16.0),
+                        DropdownButtonFormField<String>(
+                          value: _objective,
+                          decoration: InputDecoration(
+                            labelText: 'Objective',
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide: BorderSide(color: Colors.green)),
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
+                          items: _objectives.map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (newValue) {
+                            setState(() {
+                              _objective = newValue;
+                            });
+                          },
+                          validator: (value) => value == null
+                              ? 'Please select your objective'
+                              : null,
+                        ),
+                        const SizedBox(height: 16.0),
+                        DropdownButtonFormField<String>(
+                          value: _workCategory,
+                          decoration: InputDecoration(
+                            labelText: 'Work Category',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
+                          items: _workCategories.map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (newValue) {
+                            setState(() {
+                              _workCategory = newValue;
+                            });
+                          },
+                          validator: (value) => value == null
+                              ? 'Please select your work category'
+                              : null,
+                        ),
+                        const SizedBox(height: 20),
+                        _isLoading
+                            ? CircularProgressIndicator()
+                            : ElevatedButton(
+                                onPressed: _submitForm,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF7ed957),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 24.0, vertical: 12.0),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: const Text('Submit'),
+                              ),
+                      ],
                     ),
-            ],
+                  ),
+                ),
+              ),
+            ),
           ),
         ),
       ),

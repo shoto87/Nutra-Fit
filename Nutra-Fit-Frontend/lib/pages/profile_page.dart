@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -81,6 +82,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     itemCount: _dietPlans!.length,
                     itemBuilder: (context, index) {
                       final plan = _dietPlans![index];
+
+                      // Format the date
+                      DateTime createdAt = DateTime.parse(plan['created_at']);
+                      String formattedDate =
+                          DateFormat('yyyy-MM-dd hh:mm a').format(createdAt);
+
                       return Card(
                         margin: const EdgeInsets.symmetric(vertical: 5),
                         child: Padding(
@@ -93,6 +100,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               Text('Objective: ${plan['objective']}'),
                               Text('Work Category: ${plan['work_category']}'),
                               Text('Gender: ${plan['gender']}'),
+                              Text(
+                                  'Created Date: $formattedDate'), // Use formatted date
                             ],
                           ),
                         ),

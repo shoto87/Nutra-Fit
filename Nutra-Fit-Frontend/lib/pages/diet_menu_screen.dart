@@ -12,12 +12,6 @@ class DietMenuScreen extends StatefulWidget {
 
 class _DietMenuScreenState extends State<DietMenuScreen> {
   String _username = '';
-  String _email = '';
-  String _weight = '';
-  String _height = '';
-  String _objective = '';
-  String _workCategory = '';
-
   List<String> _breakfast = ['Eggs', 'Toast', 'Orange Juice'];
   List<String> _lunch = ['Grilled Chicken', 'Salad', 'Water'];
   List<String> _dinner = ['Steak', 'Broccoli', 'Green Tea'];
@@ -34,15 +28,14 @@ class _DietMenuScreenState extends State<DietMenuScreen> {
     final accessToken = prefs.getString('access_token');
 
     final response = await http.get(
-      Uri.parse('http://127.0.0.1:5000/user/profile'),
+      Uri.parse('http://127.0.0.1:5000/user-details'),
       headers: {'Authorization': 'Bearer $accessToken'},
     );
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       setState(() {
-        _username = data['name'];
-        _email = data['email'];
+        _username = data['username']; // Fetch user name
       });
     } else {
       print('Failed to load user data');
@@ -61,10 +54,9 @@ class _DietMenuScreenState extends State<DietMenuScreen> {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       setState(() {
-        _weight = data['weight'];
-        _height = data['height'];
-        _objective = data['objective'];
-        _workCategory = data['work_category'];
+        _breakfast = List<String>.from(data['breakfast']);
+        _lunch = List<String>.from(data['lunch']);
+        _dinner = List<String>.from(data['dinner']);
       });
     } else {
       print('Failed to load diet plan data');
@@ -75,66 +67,51 @@ class _DietMenuScreenState extends State<DietMenuScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Diet Menu'),
+        title: Text('Diet Menu for $_username'),
         backgroundColor: const Color(0xFF7ED957),
       ),
       backgroundColor: const Color(0xFFCCFFB6),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'User Data',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              _buildUserData(),
-              const SizedBox(height: 20),
-              const Text(
-                'Diet Menu',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              _buildDietMenu('Breakfast', _breakfast),
-              const SizedBox(height: 20),
-              _buildDietMenu('Lunch', _lunch),
-              const SizedBox(height: 20),
-              _buildDietMenu('Dinner', _dinner),
-            ],
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Text(
+                  'Displaying Diet Menu for ${_username}',
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                _buildDietMenuBox('Breakfast', _breakfast),
+                const SizedBox(height: 20),
+                _buildDietMenuBox('Lunch', _lunch),
+                const SizedBox(height: 20),
+                _buildDietMenuBox('Dinner', _dinner),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildUserData() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Name: $_username'),
-        Text('Email: $_email'),
-        Text('Weight: $_weight kg'),
-        Text('Height: $_height cm'),
-        Text('Objective: $_objective'),
-        Text('Work Category: $_workCategory'),
-      ],
-    );
-  }
-
-  Widget _buildDietMenu(String mealType, List<String> menuItems) {
+  Widget _buildDietMenuBox(String mealType, List<String> menuItems) {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(15.0), // Rounded corners
+        borderRadius: BorderRadius.circular(15.0),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.2),
             spreadRadius: 2,
             blurRadius: 5,
-            offset: const Offset(0, 3), // changes position of shadow
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -143,13 +120,17 @@ class _DietMenuScreenState extends State<DietMenuScreen> {
         children: [
           Text(
             mealType,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Colors.black,
+            ),
           ),
           const SizedBox(height: 5),
-          ...menuItems
-              .map((item) =>
-                  Text('- $item', style: const TextStyle(fontSize: 16)))
-              .toList(),
+          ...menuItems.map((item) => Text(
+                '- $item',
+                style: const TextStyle(fontSize: 16, color: Colors.black),
+              )),
         ],
       ),
     );
