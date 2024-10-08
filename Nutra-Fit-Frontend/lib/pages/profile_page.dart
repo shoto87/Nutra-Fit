@@ -1,54 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:shared_preferences/shared_preferences.dart'; // for jsonDecode
-
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({Key? key}) : super(key: key);
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
-  String? _userName;
-  String? _userEmail;
+class _ProfileScreenState extends State<ProfileScreen> {
+  String? _username;
+  String? _email;
+  List<dynamic>? _dietPlans;
 
   @override
   void initState() {
     super.initState();
-    _fetchUserData();
+    _fetchUserDetails();
   }
 
-  Future<void> _fetchUserData() async {
+  Future<void> _fetchUserDetails() async {
     final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('access_token'); // Retrieve the token
+    final token = prefs.getString('access_token');
 
-    if (token != null) {
-      final response = await http.get(
-        Uri.parse('http://127.0.0.1:5000/user/profile'),
-        headers: {"Authorization": "Bearer $token"}, // Pass the token in header
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('You need to log in first!')),
       );
+      return; // Exit if no token is found
+    }
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        setState(() {
-          _userName = data['name'] ?? 'Unknown User';
-          _userEmail = data['email'] ?? 'Unknown Email';
-        });
-      } else {
-        // Handle error
-        setState(() {
-          _userName = 'Failed to load';
-          _userEmail = 'Failed to load';
-        });
-      }
-    } else {
+    final response = await http.get(
+      Uri.parse('http://127.0.0.1:5000/user-details'),
+      headers: {
+        "Authorization": "Bearer $token",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final userData = json.decode(response.body);
       setState(() {
-        _userName = 'Not logged in';
-        _userEmail = 'Not logged in';
+        _username = userData['username'];
+        _email = userData['email'];
+        _dietPlans = userData['diet_plans'];
       });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to load user details: ${response.body}'),
+        ),
+      );
     }
   }
 
@@ -57,43 +60,46 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
-        backgroundColor: const Color(0xFF7ED957), // Green color from your theme
+        backgroundColor: Colors.green,
       ),
-      backgroundColor: const Color(0xFFCCFFB6), // Light green background
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 20.0),
-            _buildProfileDetail('Name', _userName ?? 'Loading...'),
-            const SizedBox(height: 20.0),
-            _buildProfileDetail('Email', _userEmail ?? 'Loading...'),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProfileDetail(String label, String value) {
-    return Card(
-      color: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-      elevation: 5,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              label,
-              style:
-                  const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+            Text('Email: ${_email ?? "Loading..."}'),
+            Text('Username: ${_username ?? "Loading..."}'),
+            const SizedBox(height: 20),
+            const Text(
+              'User Details:',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
-            Text(
-              value,
-              style: const TextStyle(fontSize: 18.0),
-            ),
+            _dietPlans != null && _dietPlans!.isNotEmpty
+                ? ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: _dietPlans!.length,
+                    itemBuilder: (context, index) {
+                      final plan = _dietPlans![index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(vertical: 5),
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Weight: ${plan['weight']} kg'),
+                              Text('Height: ${plan['height']} cm'),
+                              Text('Objective: ${plan['objective']}'),
+                              Text('Work Category: ${plan['work_category']}'),
+                              Text('Gender: ${plan['gender']}'),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  )
+                : const Text('No User Details Found.'),
           ],
         ),
       ),

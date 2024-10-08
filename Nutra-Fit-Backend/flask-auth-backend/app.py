@@ -30,6 +30,9 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
 
+    # Relationship to UserData
+    user_data = db.relationship('UserData', backref='user', lazy=True)
+
 # User Data model
 class UserData(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -40,8 +43,6 @@ class UserData(db.Model):
     work_category = db.Column(db.String(50), nullable=False)
     gender = db.Column(db.String(10), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-
-    user = db.relationship('User', backref=db.backref('user_data', lazy=True))
 
 # Registration
 @app.route('/register', methods=['POST'])
@@ -126,7 +127,35 @@ def create_user_data():
         logging.error(f"Error creating user data: {str(e)}")
         return jsonify({"message": "An error occurred while creating the user data."}), 500
 
-# Other endpoints for getting, updating, and deleting user data can be added here...
+# Get User Details
+@app.route('/user-details', methods=['GET'])
+@jwt_required()
+def user_details():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    user_data = {
+        "username": user.username,
+        "email": user.email,
+        "diet_plans": [
+            {
+                "weight": plan.weight,
+                "height": plan.height,
+                "objective": plan.objective,
+                "work_category": plan.work_category,
+                "gender": plan.gender,
+                "created_at": plan.created_at.isoformat()  # Optional: if you want to include created_at
+            } for plan in user.user_data  # This should be user.user_data instead of user.diet_plans
+        ]
+    }
+
+    return jsonify(user_data), 200
+
+
+    return jsonify(user_data), 200
 
 if __name__ == '__main__':
     app.run(debug=True)

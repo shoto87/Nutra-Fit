@@ -26,7 +26,7 @@ class _DietFormScreenState extends State<DietFormScreen> {
   ];
   final List<String> _workCategories = ['Sedentary', 'Active', 'Highly Active'];
 
-  bool _isLoading = false; // To manage loading state
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -115,7 +115,7 @@ class _DietFormScreenState extends State<DietFormScreen> {
                     value == null ? 'Please select your work category' : null,
               ),
               const SizedBox(height: 20),
-              _isLoading // Conditional rendering of loading state
+              _isLoading
                   ? CircularProgressIndicator()
                   : ElevatedButton(
                       onPressed: _submitForm,
@@ -131,7 +131,7 @@ class _DietFormScreenState extends State<DietFormScreen> {
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
-        _isLoading = true; // Start loading
+        _isLoading = true;
       });
 
       final dietPlan = {
@@ -142,42 +142,39 @@ class _DietFormScreenState extends State<DietFormScreen> {
         'work_category': _workCategory,
       };
 
-      // Retrieve the access token from SharedPreferences
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('access_token');
 
-      // Check if token is null
       if (token == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('You need to log in first!')),
         );
         setState(() {
-          _isLoading = false; // Stop loading
+          _isLoading = false;
         });
-        return; // Exit the method if no token is found
+        return;
       }
 
       final response = await http.post(
-        Uri.parse(
-            'http://127.0.0.1:5000/create-user-data'), // Use your local IP here
+        Uri.parse('http://127.0.0.1:5000/create-user-data'),
         headers: {
           "Content-Type": "application/json",
-          "Authorization":
-              "Bearer $token", // Include the token in the request header
+          "Authorization": "Bearer $token",
         },
         body: jsonEncode(dietPlan),
       );
 
       setState(() {
-        _isLoading = false; // Stop loading
+        _isLoading = false;
       });
 
       if (response.statusCode == 201) {
-        // Success
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Diet plan submitted successfully')),
         );
-        // Optionally, clear the form or navigate to another screen
+        Navigator.pushReplacementNamed(context,
+            '/dashboard'); // Change '/dashboard' to the correct route name.
+
         _weightController.clear();
         _heightController.clear();
         setState(() {
@@ -186,7 +183,6 @@ class _DietFormScreenState extends State<DietFormScreen> {
           _workCategory = null;
         });
       } else {
-        // Failure
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to submit diet plan: ${response.body}'),
