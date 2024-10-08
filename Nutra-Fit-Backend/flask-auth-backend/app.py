@@ -3,6 +3,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 import datetime
+import logging
+from flask_migrate import Migrate
+
 
 app = Flask(__name__)
 app.secret_key = "your_secret_key"
@@ -15,6 +18,10 @@ app.config['JWT_SECRET_KEY'] = 'your_secret_key'
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
+migrate = Migrate(app, db) 
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
 
 # User model
 class User(db.Model):
@@ -23,8 +30,8 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
 
-# Diet Plan model
-class DietPlan(db.Model):
+# User Data model
+class UserData(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     weight = db.Column(db.String(10), nullable=False)
@@ -34,7 +41,7 @@ class DietPlan(db.Model):
     gender = db.Column(db.String(10), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
-    user = db.relationship('User', backref=db.backref('diet_plans', lazy=True))
+    user = db.relationship('User', backref=db.backref('user_data', lazy=True))
 
 # Registration
 @app.route('/register', methods=['POST'])
@@ -64,49 +71,27 @@ def login():
         access_token = create_access_token(identity=user.id, expires_delta=datetime.timedelta(days=1))
         return jsonify(access_token=access_token), 200
     else:
+        logging.warning(f"Failed login attempt for email: {email}")
         return jsonify({"message": "Invalid credentials!"}), 401
 
 # Logout
 @app.route('/logout', methods=['POST'])
 def logout():
-    session.clear()  # Clears the user session
+    session.clear()
     return jsonify({"message": "Successfully logged out"}), 200
 
-# Dashboard
-@app.route('/data', methods=['GET'])
-def get_data():
-    data = {
-        'message': 'Welcome to your dashboard!'
-    }
-    return jsonify(data)
-
-# Profile
-@app.route('/user/profile', methods=['GET'])
+# Create User Data
+@app.route('/create-user-data', methods=['POST'])
 @jwt_required()
-def profile():
-    current_user_id = get_jwt_identity()  # Get the current user ID from the JWT
-    user = User.query.get(current_user_id)
-    
-    if user:
-        return jsonify({
-            'name': user.username,
-            'email': user.email
-        }), 200
-    else:
-        return jsonify({"message": "User not found!"}), 404
-
-# Create Diet Plan
-@app.route('/create-diet-plan', methods=['POST'])
-@jwt_required()
-def create_diet_plan():
+def create_user_data():
     current_user_id = get_jwt_identity()
     user = User.query.get(current_user_id)
 
     if not user:
+        logging.warning(f"User not found for ID: {current_user_id}")
         return jsonify({"message": "User not found"}), 404
 
     data = request.get_json()
-    print(data)  # Debugging to check if data is received correctly
 
     weight = data.get('weight')
     height = data.get('height')
@@ -114,48 +99,34 @@ def create_diet_plan():
     work_category = data.get('work_category')
     gender = data.get('gender')
 
+    # Check for required fields
     if not all([weight, height, objective, work_category, gender]):
+        logging.warning("One or more fields are missing: "
+                        f"weight={weight}, height={height}, "
+                        f"objective={objective}, work_category={work_category}, gender={gender}")
         return jsonify({"message": "All fields are required"}), 400
 
-    new_plan = DietPlan(
-        user_id=current_user_id,
-        weight=weight,
-        height=height,
-        objective=objective,
-        work_category=work_category,
-        gender=gender
-    )
+    try:
+        new_user_data = UserData(
+            user_id=current_user_id,
+            weight=weight,
+            height=height,
+            objective=objective,
+            work_category=work_category,
+            gender=gender
+        )
 
-    db.session.add(new_plan)
-    db.session.commit()
+        db.session.add(new_user_data)
+        db.session.commit()
+        logging.info(f"User data created successfully for user ID: {current_user_id}")
 
-    return jsonify({"message": "Diet plan created successfully!"}), 201
+        return jsonify({"message": "User data created successfully!"}), 201
 
-# display diet plan
+    except Exception as e:
+        logging.error(f"Error creating user data: {str(e)}")
+        return jsonify({"message": "An error occurred while creating the user data."}), 500
 
-# Get Diet Plan for Current User
-@app.route('/diet-plan', methods=['GET'])
-@jwt_required()
-def get_diet_plan():
-    current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
-    
-    if user:
-        diet_plan = DietPlan.query.filter_by(user_id=current_user_id).first()
-        if diet_plan:
-            return jsonify({
-                'weight': diet_plan.weight,
-                'height': diet_plan.height,
-                'objective': diet_plan.objective,
-                'work_category': diet_plan.work_category,
-                'gender': diet_plan.gender
-            }), 200
-        else:
-            return jsonify({"message": "No diet plan found"}), 404
-    else:
-        return jsonify({"message": "User not found"}), 404
-
-
+# Other endpoints for getting, updating, and deleting user data can be added here...
 
 if __name__ == '__main__':
     app.run(debug=True)
