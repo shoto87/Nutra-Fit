@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:login_flask/pages/diet_menu_screen.dart';
+import 'package:login_flask/pages/settings.dart';
 // for jsonEncode and jsonDecode
 import 'diet_form.dart';
 import 'diet_plan_view.dart';
@@ -197,8 +198,7 @@ class DashboardPage extends StatelessWidget {
                 () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => const SettingsPage()),
+                    MaterialPageRoute(builder: (context) => SettingsScreen()),
                   );
                 },
               ),
