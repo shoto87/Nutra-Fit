@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import '../theme/theme_provider.dart';
 
 class DietMenuScreen extends StatefulWidget {
   const DietMenuScreen({super.key});
@@ -65,32 +67,41 @@ class _DietMenuScreenState extends State<DietMenuScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Diet Menu for $_username'),
-        backgroundColor: const Color(0xFF7ED957),
+        backgroundColor: isDarkMode
+            ? const Color(0xFF7ED957)
+                .withOpacity(0.7) // Dark mode app bar color
+            : const Color(0xFF7ED957), // Light mode app bar color
       ),
-      backgroundColor: const Color(0xFFCCFFB6),
+      backgroundColor: isDarkMode
+          ? Colors.black87
+          : const Color(0xFFCCFFB6), // Background color
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(
           child: SingleChildScrollView(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Displaying Diet Menu for ${_username}',
-                  style: const TextStyle(
+                  'Displaying Diet Menu for $_username',
+                  style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    color: isDarkMode ? Colors.white : Colors.black,
                   ),
                 ),
                 const SizedBox(height: 20),
-                _buildDietMenuBox('Breakfast', _breakfast),
+                _buildDietMenuBox('Breakfast', _breakfast, isDarkMode),
                 const SizedBox(height: 20),
-                _buildDietMenuBox('Lunch', _lunch),
+                _buildDietMenuBox('Lunch', _lunch, isDarkMode),
                 const SizedBox(height: 20),
-                _buildDietMenuBox('Dinner', _dinner),
+                _buildDietMenuBox('Dinner', _dinner, isDarkMode),
               ],
             ),
           ),
@@ -99,12 +110,15 @@ class _DietMenuScreenState extends State<DietMenuScreen> {
     );
   }
 
-  Widget _buildDietMenuBox(String mealType, List<String> menuItems) {
+  Widget _buildDietMenuBox(
+      String mealType, List<String> menuItems, bool isDarkMode) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDarkMode
+            ? Colors.grey[850]
+            : Colors.white, // Box color based on theme
         borderRadius: BorderRadius.circular(15.0),
         boxShadow: [
           BoxShadow(
@@ -120,16 +134,20 @@ class _DietMenuScreenState extends State<DietMenuScreen> {
         children: [
           Text(
             mealType,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
-              color: Colors.black,
+              color: isDarkMode
+                  ? Colors.greenAccent
+                  : Color(0xFF7ED957), // Text color based on theme
             ),
           ),
           const SizedBox(height: 5),
           ...menuItems.map((item) => Text(
                 '- $item',
-                style: const TextStyle(fontSize: 16, color: Colors.black),
+                style: TextStyle(
+                    fontSize: 16,
+                    color: isDarkMode ? Colors.white70 : Colors.black),
               )),
         ],
       ),

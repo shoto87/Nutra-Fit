@@ -33,10 +33,8 @@ class _DietFormScreenState extends State<DietFormScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Diet Plan Form'),
-        backgroundColor: const Color(0xFF7ed957),
       ),
       body: Container(
-        color: const Color(0xFFccffb6),
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Center(
@@ -61,8 +59,6 @@ class _DietFormScreenState extends State<DietFormScreen> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),
-                            filled: true,
-                            fillColor: Colors.white,
                           ),
                           keyboardType: TextInputType.number,
                           validator: (value) {
@@ -80,8 +76,6 @@ class _DietFormScreenState extends State<DietFormScreen> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),
-                            filled: true,
-                            fillColor: Colors.white,
                           ),
                           keyboardType: TextInputType.number,
                           validator: (value) {
@@ -99,8 +93,6 @@ class _DietFormScreenState extends State<DietFormScreen> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),
-                            filled: true,
-                            fillColor: Colors.white,
                           ),
                           items: _genders.map((String value) {
                             return DropdownMenuItem<String>(
@@ -123,10 +115,8 @@ class _DietFormScreenState extends State<DietFormScreen> {
                           decoration: InputDecoration(
                             labelText: 'Objective',
                             border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                                borderSide: BorderSide(color: Colors.green)),
-                            filled: true,
-                            fillColor: Colors.white,
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
                           ),
                           items: _objectives.map((String value) {
                             return DropdownMenuItem<String>(
@@ -151,8 +141,6 @@ class _DietFormScreenState extends State<DietFormScreen> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),
-                            filled: true,
-                            fillColor: Colors.white,
                           ),
                           items: _workCategories.map((String value) {
                             return DropdownMenuItem<String>(
@@ -175,7 +163,6 @@ class _DietFormScreenState extends State<DietFormScreen> {
                             : ElevatedButton(
                                 onPressed: _submitForm,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF7ed957),
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 24.0, vertical: 12.0),
                                   shape: RoundedRectangleBorder(
@@ -240,8 +227,7 @@ class _DietFormScreenState extends State<DietFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Diet plan submitted successfully')),
         );
-        Navigator.pushReplacementNamed(context,
-            '/dashboard'); // Change '/dashboard' to the correct route name.
+        Navigator.pushReplacementNamed(context, '/dashboard');
 
         _weightController.clear();
         _heightController.clear();
