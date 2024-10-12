@@ -29,6 +29,11 @@ class DashboardPage extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
 
+    // Fetch user data (you can customize this part as per your data management)
+    final userData = getUserData(); // Method to get user data
+    final userObjective =
+        userData['objective'] ?? 'weight maintenance'; // Default value
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -40,10 +45,7 @@ class DashboardPage extends StatelessWidget {
         actions: [
           IconButton(
             icon: Icon(Icons.person,
-                size: 30,
-                color: isDarkMode
-                    ? Colors.white70
-                    : Colors.black54), // Dimmed color
+                size: 30, color: isDarkMode ? Colors.white70 : Colors.black54),
             onPressed: () {
               Navigator.push(
                 context,
@@ -53,10 +55,7 @@ class DashboardPage extends StatelessWidget {
           ),
           IconButton(
             icon: Icon(Icons.logout,
-                size: 30,
-                color: isDarkMode
-                    ? Colors.white70
-                    : Colors.black54), // Dimmed color
+                size: 30, color: isDarkMode ? Colors.white70 : Colors.black54),
             onPressed: () => _logout(context),
           ),
         ],
@@ -71,7 +70,7 @@ class DashboardPage extends StatelessWidget {
           children: [
             _buildMotivationalQuote(isDarkMode),
             const SizedBox(height: 20.0),
-            _buildDailySummary(isDarkMode),
+            _buildDailySummary(userObjective, isDarkMode),
             const SizedBox(height: 20.0),
             _buildQuickAccessButtons(context, isDarkMode),
           ],
@@ -108,7 +107,7 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-  Widget _buildDailySummary(bool isDarkMode) {
+  Widget _buildDailySummary(String userObjective, bool isDarkMode) {
     return Card(
       color: isDarkMode ? Colors.grey[800] : Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
@@ -125,14 +124,42 @@ class DashboardPage extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   color: isDarkMode ? Colors.greenAccent : Color(0xFF7ED957)),
             ),
-            const SizedBox(height: 10.0),
-            _buildSummaryItem('Calories Consumed', '1,800 kcal', isDarkMode),
-            _buildSummaryItem('Steps Taken', '8,000', isDarkMode),
-            _buildSummaryItem('Water Intake', '1.5L', isDarkMode),
+            // const SizedBox(height: 10.0),
+            // _buildSummaryItem('Calories Consumed', '1,800 kcal', isDarkMode),
+            // _buildSummaryItem('Steps Taken', '8,000', isDarkMode),
+            // _buildSummaryItem('Water Intake', '1.5L', isDarkMode),
+            // const SizedBox(height: 10.0),
+            Text(
+              'Tips for ${userObjective == 'muscle gain' ? 'Weight Gain' : userObjective == 'weight loss' ? 'Weight Loss' : 'Weight Maintenance'}:',
+              style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.greenAccent : Colors.black87),
+            ),
+            const SizedBox(height: 5.0),
+            Text(
+              _getTips(userObjective),
+              style: TextStyle(
+                  fontSize: 16.0,
+                  color: isDarkMode ? Colors.white70 : Colors.black87),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  String _getTips(String userObjective) {
+    switch (userObjective) {
+      case 'muscle gain':
+        return 'Focus on high-protein foods like chicken, fish, and legumes. Incorporate strength training exercises into your routine.';
+      case 'weight loss':
+        return 'Opt for whole foods, control portion sizes, and include plenty of vegetables in your meals.';
+      case 'maintenance':
+        return 'Balance your caloric intake with your energy expenditure. Keep your diet varied and nutritious.';
+      default:
+        return 'Stay active and maintain a balanced diet!';
+    }
   }
 
   Widget _buildSummaryItem(String title, String value, bool isDarkMode) {
@@ -146,8 +173,7 @@ class DashboardPage extends StatelessWidget {
             style: TextStyle(
               fontSize: 16.0,
               fontWeight: FontWeight.w500,
-              color:
-                  isDarkMode ? Colors.white70 : Colors.black87, // Dimmed color
+              color: isDarkMode ? Colors.white70 : Colors.black87,
             ),
           ),
           Text(
@@ -155,8 +181,7 @@ class DashboardPage extends StatelessWidget {
             style: TextStyle(
               fontSize: 16.0,
               fontWeight: FontWeight.w500,
-              color:
-                  isDarkMode ? Colors.white70 : Colors.black87, // Dimmed color
+              color: isDarkMode ? Colors.white70 : Colors.black87,
             ),
           ),
         ],
@@ -247,9 +272,7 @@ class DashboardPage extends StatelessWidget {
         children: [
           Icon(icon,
               size: 40.0,
-              color: isDarkMode
-                  ? Colors.greenAccent
-                  : Colors.black54), // Updated icon color
+              color: isDarkMode ? Colors.greenAccent : Colors.black54),
           const SizedBox(height: 10.0),
           Text(
             label,
@@ -258,5 +281,13 @@ class DashboardPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  // Mock method to represent fetching user data
+  Map<String, dynamic> getUserData() {
+    // Replace with actual data fetching logic
+    return {
+      'objective': 'weight loss', // Example user objective
+    };
   }
 }
