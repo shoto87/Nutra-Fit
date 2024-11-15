@@ -22,7 +22,9 @@ class _DietFormScreenState extends State<DietFormScreen> {
   final List<String> _objectives = [
     'Weight Loss',
     'Muscle Gain',
-    'Maintain Weight'
+    'Maintain Weight',
+    'Diebetes type 2',
+    'chronic kidney disease'
   ];
   final List<String> _workCategories = ['Sedentary', 'Active', 'Highly Active'];
 
@@ -88,6 +90,7 @@ class _DietFormScreenState extends State<DietFormScreen> {
                         const SizedBox(height: 16.0),
                         DropdownButtonFormField<String>(
                           value: _gender,
+                          // dropdownColor: Color(0xFF437a37),
                           decoration: InputDecoration(
                             labelText: 'Gender',
                             border: OutlineInputBorder(
@@ -97,7 +100,10 @@ class _DietFormScreenState extends State<DietFormScreen> {
                           items: _genders.map((String value) {
                             return DropdownMenuItem<String>(
                               value: value,
-                              child: Text(value),
+                              child: Text(
+                                value,
+                                style: const TextStyle(color: Colors.black),
+                              ),
                             );
                           }).toList(),
                           onChanged: (newValue) {
@@ -112,6 +118,7 @@ class _DietFormScreenState extends State<DietFormScreen> {
                         const SizedBox(height: 16.0),
                         DropdownButtonFormField<String>(
                           value: _objective,
+                          // dropdownColor: Color(0xFF437a37),
                           decoration: InputDecoration(
                             labelText: 'Objective',
                             border: OutlineInputBorder(
@@ -121,7 +128,10 @@ class _DietFormScreenState extends State<DietFormScreen> {
                           items: _objectives.map((String value) {
                             return DropdownMenuItem<String>(
                               value: value,
-                              child: Text(value),
+                              child: Text(
+                                value,
+                                style: const TextStyle(color: Colors.black),
+                              ),
                             );
                           }).toList(),
                           onChanged: (newValue) {
@@ -136,6 +146,7 @@ class _DietFormScreenState extends State<DietFormScreen> {
                         const SizedBox(height: 16.0),
                         DropdownButtonFormField<String>(
                           value: _workCategory,
+                          // dropdownColor: Color(0xFF437a37),
                           decoration: InputDecoration(
                             labelText: 'Work Category',
                             border: OutlineInputBorder(
@@ -145,7 +156,10 @@ class _DietFormScreenState extends State<DietFormScreen> {
                           items: _workCategories.map((String value) {
                             return DropdownMenuItem<String>(
                               value: value,
-                              child: Text(value),
+                              child: Text(
+                                value,
+                                style: const TextStyle(color: Colors.black),
+                              ),
                             );
                           }).toList(),
                           onChanged: (newValue) {

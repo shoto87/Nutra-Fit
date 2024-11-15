@@ -131,7 +131,10 @@ class _RegisterPageState extends State<RegisterPage> {
                     ? const CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       )
-                    : const Text('Register'),
+                    : const Text(
+                        'Register',
+                        style: const TextStyle(color: Colors.black),
+                      ),
               ),
             ],
           ),
