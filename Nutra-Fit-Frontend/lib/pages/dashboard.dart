@@ -1,5 +1,7 @@
+// dashboard
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:login_flask/templates/UserForm.dart';
 import 'package:provider/provider.dart';
 import '../theme/theme_provider.dart';
 import 'diet_form.dart';
@@ -55,7 +57,10 @@ class DashboardPage extends StatelessWidget {
           ),
           IconButton(
             icon: Icon(Icons.logout,
-                size: 30, color: isDarkMode ? Colors.white70 : Colors.black54),
+                size: 30,
+                color: isDarkMode
+                    ? const Color.fromARGB(179, 255, 255, 255)
+                    : Colors.black54),
             onPressed: () => _logout(context),
           ),
         ],
@@ -202,8 +207,7 @@ class DashboardPage extends StatelessWidget {
                 () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => const DietFormScreen()),
+                    MaterialPageRoute(builder: (context) => UserFormScreen()),
                   );
                 },
                 isDarkMode,
@@ -215,7 +219,9 @@ class DashboardPage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const DietMenuScreen()),
+                        builder: (context) => DietMenuScreen(
+                              dietPlan: [],
+                            )),
                   );
                 },
                 isDarkMode,

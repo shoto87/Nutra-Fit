@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'diet_menu_screen.dart';
 
 class DietFormScreen extends StatefulWidget {
   const DietFormScreen({Key? key}) : super(key: key);
@@ -17,16 +18,15 @@ class _DietFormScreenState extends State<DietFormScreen> {
   String? _gender;
   String? _objective;
   String? _workCategory;
-
   final List<String> _genders = ['Male', 'Female', 'Other'];
   final List<String> _objectives = [
     'Weight Loss',
     'Muscle Gain',
     'Maintain Weight',
-    'Diebetes type 2',
-    'chronic kidney disease'
+    'Diabetes type 2',
+    'Chronic Kidney Disease'
   ];
-  final List<String> _workCategories = ['Sedentary', 'Active', 'Highly Active'];
+  final List<String> _workCategories = ['Sedentary', 'Light', 'Moderate'];
 
   bool _isLoading = false;
 
@@ -90,99 +90,99 @@ class _DietFormScreenState extends State<DietFormScreen> {
                         const SizedBox(height: 16.0),
                         DropdownButtonFormField<String>(
                           value: _gender,
-                          // dropdownColor: Color(0xFF437a37),
                           decoration: InputDecoration(
                             labelText: 'Gender',
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),
                           ),
-                          items: _genders.map((String value) {
+                          items: _genders.map((String gender) {
                             return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(
-                                value,
-                                style: const TextStyle(color: Colors.black),
-                              ),
+                              value: gender,
+                              child: Text(gender),
                             );
                           }).toList(),
-                          onChanged: (newValue) {
+                          onChanged: (value) {
                             setState(() {
-                              _gender = newValue;
+                              _gender = value;
                             });
                           },
-                          validator: (value) => value == null
-                              ? 'Please select your gender'
-                              : null,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please select your gender';
+                            }
+                            return null;
+                          },
                         ),
                         const SizedBox(height: 16.0),
                         DropdownButtonFormField<String>(
                           value: _objective,
-                          // dropdownColor: Color(0xFF437a37),
                           decoration: InputDecoration(
                             labelText: 'Objective',
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),
                           ),
-                          items: _objectives.map((String value) {
+                          items: _objectives.map((String objective) {
                             return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(
-                                value,
-                                style: const TextStyle(color: Colors.black),
-                              ),
+                              value: objective,
+                              child: Text(objective),
                             );
                           }).toList(),
-                          onChanged: (newValue) {
+                          onChanged: (value) {
                             setState(() {
-                              _objective = newValue;
+                              _objective = value;
                             });
                           },
-                          validator: (value) => value == null
-                              ? 'Please select your objective'
-                              : null,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please select an objective';
+                            }
+                            return null;
+                          },
                         ),
                         const SizedBox(height: 16.0),
                         DropdownButtonFormField<String>(
                           value: _workCategory,
-                          // dropdownColor: Color(0xFF437a37),
                           decoration: InputDecoration(
                             labelText: 'Work Category',
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
                             ),
                           ),
-                          items: _workCategories.map((String value) {
+                          items: _workCategories.map((String workCategory) {
                             return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(
-                                value,
-                                style: const TextStyle(color: Colors.black),
-                              ),
+                              value: workCategory,
+                              child: Text(workCategory),
                             );
                           }).toList(),
-                          onChanged: (newValue) {
+                          onChanged: (value) {
                             setState(() {
-                              _workCategory = newValue;
+                              _workCategory = value;
                             });
                           },
-                          validator: (value) => value == null
-                              ? 'Please select your work category'
-                              : null,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please select your work category';
+                            }
+                            return null;
+                          },
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 16.0),
                         _isLoading
-                            ? CircularProgressIndicator()
+                            ? const CircularProgressIndicator()
                             : ElevatedButton(
-                                onPressed: _submitForm,
-                                style: ElevatedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 24.0, vertical: 12.0),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                ),
+                                onPressed: () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    setState(() {
+                                      _isLoading = true;
+                                    });
+                                    await _submitForm();
+                                    setState(() {
+                                      _isLoading = false;
+                                    });
+                                  }
+                                },
                                 child: const Text('Submit'),
                               ),
                       ],
@@ -198,72 +198,41 @@ class _DietFormScreenState extends State<DietFormScreen> {
   }
 
   Future<void> _submitForm() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-
-      final dietPlan = {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('jwt_token') ?? '';
+    final url = Uri.parse('http://127.0.0.1:5000/create-user-data');
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
         'weight': _weightController.text,
         'height': _heightController.text,
         'gender': _gender,
         'objective': _objective,
         'work_category': _workCategory,
-      };
+        'age': 25, // Adjust as needed
+      }),
+    );
 
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('access_token');
-
-      if (token == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('You need to log in first!')),
-        );
-        setState(() {
-          _isLoading = false;
-        });
-        return;
-      }
-
-      final response = await http.post(
-        Uri.parse('http://127.0.0.1:5000/create-user-data'),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $token",
-        },
-        body: jsonEncode(dietPlan),
-      );
-
-      setState(() {
-        _isLoading = false;
-      });
-
-      if (response.statusCode == 201) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Diet plan submitted successfully')),
-        );
-        Navigator.pushReplacementNamed(context, '/dashboard');
-
-        _weightController.clear();
-        _heightController.clear();
-        setState(() {
-          _gender = null;
-          _objective = null;
-          _workCategory = null;
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to submit diet plan: ${response.body}'),
+    if (response.statusCode == 201) {
+      final data = json.decode(response.body);
+      if (_objective == 'Weight Loss') {
+        // Navigate to the Diet Menu screen with the diet plan
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DietMenuScreen(dietPlan: data['diet_plan']),
           ),
         );
       }
+    } else {
+      // Handle error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${response.body}')),
+      );
     }
-  }
-
-  @override
-  void dispose() {
-    _weightController.dispose();
-    _heightController.dispose();
-    super.dispose();
   }
 }

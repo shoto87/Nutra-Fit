@@ -26,7 +26,9 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => LoginPage(),
         '/dashboard': (context) => DashboardPage(),
-        '/diet-menu': (context) => DietMenuScreen(),
+        '/diet-menu': (context) => DietMenuScreen(
+              dietPlan: [],
+            ),
       },
     );
   }

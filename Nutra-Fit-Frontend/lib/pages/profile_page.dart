@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:intl/intl.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -14,7 +13,6 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   String? _username;
   String? _email;
-  List<dynamic>? _dietPlans;
 
   @override
   void initState() {
@@ -30,7 +28,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('You need to log in first!')),
       );
-      return; // Exit if no token is found
+      return;
     }
 
     final response = await http.get(
@@ -45,7 +43,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {
         _username = userData['username'];
         _email = userData['email'];
-        _dietPlans = userData['diet_plans'];
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -61,55 +58,62 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
-        // backgroundColor: Colors.green,
+        backgroundColor:
+            const Color(0xFF7ED957).withOpacity(0.7), // Dimmed color
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Email: ${_email ?? "Loading..."}'),
-            Text('Username: ${_username ?? "Loading..."}'),
-            const SizedBox(height: 20),
-            const Text(
-              'User Details:',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: Colors.green.shade50,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.3),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
+                ),
+              ],
             ),
-            _dietPlans != null && _dietPlans!.isNotEmpty
-                ? ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: _dietPlans!.length,
-                    itemBuilder: (context, index) {
-                      final plan = _dietPlans![index];
-
-                      // Format the date
-                      DateTime createdAt = DateTime.parse(plan['created_at']);
-                      String formattedDate =
-                          DateFormat('yyyy-MM-dd hh:mm a').format(createdAt);
-
-                      return Card(
-                        margin: const EdgeInsets.symmetric(vertical: 5),
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Weight: ${plan['weight']} kg'),
-                              Text('Height: ${plan['height']} cm'),
-                              Text('Objective: ${plan['objective']}'),
-                              Text('Work Category: ${plan['work_category']}'),
-                              Text('Gender: ${plan['gender']}'),
-                              Text(
-                                  'Created Date: $formattedDate'), // Use formatted date
-                            ],
-                          ),
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.person, size: 40, color: Colors.green),
+                    const SizedBox(width: 10),
+                    Text(
+                      _username ?? "Loading...",
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ],
+                ),
+                const Divider(height: 30, thickness: 1, color: Colors.green),
+                Row(
+                  children: [
+                    const Icon(Icons.email, size: 30, color: Colors.green),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        _email ?? "Loading...",
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: Colors.black87,
                         ),
-                      );
-                    },
-                  )
-                : const Text('No User Details Found.'),
-          ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
