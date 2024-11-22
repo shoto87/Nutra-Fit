@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify
 import wtmaintenance  
 import wtloss  
+import ckd2
+import diebetes
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
@@ -204,6 +206,55 @@ def weight_loss():
     recipes = wtloss.wtloss(weight, height, gender, age, work)
 
     return jsonify(recipes)  # Return the recipes in JSON format
+
+    
+@app.route('/chronic-kidney', methods=['POST'])
+def chronic_kidney():
+    data = request.get_json()
+    weight = data['weight']
+    height = data['height']
+    gender = data['gender']
+    age = data['age']
+    work = data['work']
+
+    # Call the wtloss function from wtloss.py to get the recipes
+    recipes =ckd2.chronickidneydisease(weight, height, gender, age, work)
+
+    return jsonify(recipes)  # Return the recipes in JSON format
+
+
+@app.route('/diebetes', methods=['POST'])
+def diebetes():
+    try:
+        # Parse input data
+        data = request.get_json()
+        weight = float(data['weight'])
+        height = float(data['height'])
+        gender = data['gender']
+        age = int(data['age'])
+        work = data['work']
+
+        # Call the diabetes function
+        if weight > 0 and height > 0:
+            response = diebetes.diabetes(weight, height, gender, age, work)
+
+            # Return the response based on the logic in diabetes.py
+            return jsonify({
+                "message": "Diabetes management function executed successfully!",
+                "result": response  # Add any relevant data from `diabetes` function
+            }), 200
+        else:
+            return jsonify({
+                "message": "Invalid weight or height values!"
+            }), 400
+
+    except Exception as e:
+        logging.error(f"Error in diebetes endpoint: {str(e)}")
+        return jsonify({
+            "message": "An error occurred while processing the request.",
+            "error": str(e)
+        }), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)

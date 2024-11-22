@@ -19,13 +19,25 @@ class RecipesPage extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.no_food,
-                    size: 80,
-                    color: Colors.grey[600],
+                    size: 100,
+                    color: Colors.grey[500],
                   ),
                   const SizedBox(height: 16),
                   const Text(
                     "No recipes available",
-                    style: TextStyle(fontSize: 20, color: Colors.grey),
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    "Try adding some recipes to your plan!",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                      fontStyle: FontStyle.italic,
+                    ),
                   ),
                 ],
               ),
@@ -47,13 +59,12 @@ class RecipesPage extends StatelessWidget {
                     border: TableBorder.all(
                       color: Colors.grey.shade400,
                       width: 1,
-                      borderRadius: BorderRadius.circular(8),
                     ),
                     columnWidths: {
-                      0: const FixedColumnWidth(160),
-                      1: const FixedColumnWidth(80),
-                      2: const FixedColumnWidth(80),
-                      3: const FixedColumnWidth(80),
+                      0: const FlexColumnWidth(3),
+                      1: const FlexColumnWidth(1),
+                      2: const FlexColumnWidth(1),
+                      3: const FlexColumnWidth(1),
                     },
                     children: [
                       TableRow(
@@ -67,11 +78,13 @@ class RecipesPage extends StatelessWidget {
                           _buildTableHeaderCell('Carbs (g)'),
                         ],
                       ),
-                      // Create table rows for each recipe
+                      // Generate table rows for recipes
                       for (var recipe in recipes)
                         TableRow(
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade50,
+                            color: recipes.indexOf(recipe) % 2 == 0
+                                ? Colors.grey.shade200
+                                : Colors.grey.shade50,
                           ),
                           children: [
                             _buildTableCell(recipe['recipe_name'] ?? 'No Name'),
@@ -97,6 +110,9 @@ class RecipesPage extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           vertical: 12, horizontal: 20),
                       textStyle: const TextStyle(fontSize: 18),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                   ),
                 ],
@@ -107,7 +123,7 @@ class RecipesPage extends StatelessWidget {
 
   Widget _buildTableHeaderCell(String text) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
       child: Text(
         text,
         style: const TextStyle(
@@ -121,7 +137,7 @@ class RecipesPage extends StatelessWidget {
 
   Widget _buildTableCell(String text) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 8.0),
       child: Text(
         text,
         style: const TextStyle(fontSize: 14),

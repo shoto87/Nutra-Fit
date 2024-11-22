@@ -1,4 +1,3 @@
-// dashboard
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:login_flask/templates/UserForm.dart';
@@ -31,54 +30,66 @@ class DashboardPage extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
 
-    // Fetch user data (you can customize this part as per your data management)
-    final userData = getUserData(); // Method to get user data
-    final userObjective =
-        userData['objective'] ?? 'weight maintenance'; // Default value
+    final userData = getUserData(); // Mock user data
+    final userObjective = userData['objective'] ?? 'weight maintenance';
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
           'Dashboard',
-          style: TextStyle(color: isDarkMode ? Colors.white70 : Colors.black87),
+          style: TextStyle(
+              color: isDarkMode ? Colors.white70 : Colors.black87,
+              fontSize: 24.0,
+              fontWeight: FontWeight.bold),
         ),
-        backgroundColor:
-            const Color(0xFF7ED957).withOpacity(0.7), // Dimmed color
+        backgroundColor: isDarkMode
+            ? const Color(0xFF303030)
+            : const Color(0xFF7ED957).withOpacity(0.8),
         actions: [
-          IconButton(
-            icon: Icon(Icons.person,
-                size: 30, color: isDarkMode ? Colors.white70 : Colors.black54),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ProfileScreen()),
-              );
-            },
+          CircleAvatar(
+            backgroundColor: isDarkMode ? Colors.greenAccent : Colors.white,
+            child: IconButton(
+              icon: const Icon(Icons.person),
+              color: isDarkMode ? Colors.black : Colors.green,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ProfileScreen()),
+                );
+              },
+            ),
           ),
+          const SizedBox(width: 10),
           IconButton(
             icon: Icon(Icons.logout,
-                size: 30,
-                color: isDarkMode
-                    ? const Color.fromARGB(179, 255, 255, 255)
-                    : Colors.black54),
+                size: 28, color: isDarkMode ? Colors.white70 : Colors.black54),
             onPressed: () => _logout(context),
           ),
         ],
       ),
-      backgroundColor: isDarkMode
-          ? Colors.black54
-          : const Color(0xFFCCFFB6), // Dimmed background in dark mode
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildMotivationalQuote(isDarkMode),
-            const SizedBox(height: 20.0),
-            _buildDailySummary(userObjective, isDarkMode),
-            const SizedBox(height: 20.0),
-            _buildQuickAccessButtons(context, isDarkMode),
-          ],
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: isDarkMode
+                ? [Colors.black87, Colors.black54]
+                : [Colors.white, const Color(0xFFCCFFB6)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildMotivationalQuote(isDarkMode),
+              const SizedBox(height: 20.0),
+              _buildDailySummary(userObjective, isDarkMode),
+              const SizedBox(height: 30.0),
+              _buildQuickAccessButtons(context, isDarkMode),
+            ],
+          ),
         ),
       ),
     );
@@ -86,25 +97,29 @@ class DashboardPage extends StatelessWidget {
 
   Widget _buildMotivationalQuote(bool isDarkMode) {
     return Card(
-      color: isDarkMode ? Colors.grey[800] : const Color(0xFF7ED957),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-      elevation: 5,
+      elevation: 8.0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+      color: isDarkMode ? Colors.grey[900] : const Color(0xFF7ED957),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Motivational Quote of the Day:',
+              '🌟 Motivational Quote of the Day:',
               style: TextStyle(
                   fontSize: 18.0,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.greenAccent : Colors.black54),
+                  color: isDarkMode ? Colors.greenAccent : Colors.black87),
             ),
             const SizedBox(height: 10.0),
-            const Text(
+            Text(
               '“The journey of a thousand miles begins with a single step.”',
-              style: TextStyle(fontSize: 16.0, color: Colors.white70),
+              style: TextStyle(
+                fontSize: 16.0,
+                color: isDarkMode ? Colors.white70 : Colors.white,
+                fontStyle: FontStyle.italic,
+              ),
             ),
           ],
         ),
@@ -114,39 +129,37 @@ class DashboardPage extends StatelessWidget {
 
   Widget _buildDailySummary(String userObjective, bool isDarkMode) {
     return Card(
-      color: isDarkMode ? Colors.grey[800] : Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-      elevation: 5,
+      elevation: 8.0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+      color: isDarkMode ? Colors.grey[850] : Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Daily Summary',
+              '📊 Daily Summary',
               style: TextStyle(
                   fontSize: 20.0,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.greenAccent : Color(0xFF7ED957)),
+                  color: isDarkMode
+                      ? Colors.greenAccent
+                      : const Color(0xFF7ED957)),
             ),
-            // const SizedBox(height: 10.0),
-            // _buildSummaryItem('Calories Consumed', '1,800 kcal', isDarkMode),
-            // _buildSummaryItem('Steps Taken', '8,000', isDarkMode),
-            // _buildSummaryItem('Water Intake', '1.5L', isDarkMode),
-            // const SizedBox(height: 10.0),
+            const SizedBox(height: 10.0),
             Text(
-              'Tips for ${userObjective == 'muscle gain' ? 'Weight Gain' : userObjective == 'weight loss' ? 'Weight Loss' : 'Weight Maintenance'}:',
+              'Tips for ${userObjective.toUpperCase()}:',
               style: TextStyle(
                   fontSize: 16.0,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.greenAccent : Colors.black87),
+                  color: isDarkMode ? Colors.white70 : Colors.black87),
             ),
             const SizedBox(height: 5.0),
             Text(
               _getTips(userObjective),
               style: TextStyle(
                   fontSize: 16.0,
-                  color: isDarkMode ? Colors.white70 : Colors.black87),
+                  color: isDarkMode ? Colors.white70 : Colors.black54),
             ),
           ],
         ),
@@ -154,109 +167,40 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-  String _getTips(String userObjective) {
-    switch (userObjective) {
-      case 'muscle gain':
-        return 'Focus on high-protein foods like chicken, fish, and legumes. Incorporate strength training exercises into your routine.';
-      case 'weight loss':
-        return 'Opt for whole foods, control portion sizes, and include plenty of vegetables in your meals.';
-      case 'maintenance':
-        return 'Balance your caloric intake with your energy expenditure. Keep your diet varied and nutritious.';
-      default:
-        return 'Stay active and maintain a balanced diet!';
-    }
-  }
-
-  Widget _buildSummaryItem(String title, String value, bool isDarkMode) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 16.0,
-              fontWeight: FontWeight.w500,
-              color: isDarkMode ? Colors.white70 : Colors.black87,
-            ),
-          ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 16.0,
-              fontWeight: FontWeight.w500,
-              color: isDarkMode ? Colors.white70 : Colors.black87,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildQuickAccessButtons(BuildContext context, bool isDarkMode) {
     return Expanded(
-      child: Column(
+      child: GridView.count(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12.0,
+        mainAxisSpacing: 12.0,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildQuickAccessButton(
-                'Create Diet Plan',
-                Icons.add_circle,
-                () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => UserFormScreen()),
-                  );
-                },
-                isDarkMode,
-              ),
-              _buildQuickAccessButton(
-                'View Diet Plan',
-                Icons.list,
-                () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => DietMenuScreen(
-                              dietPlan: [],
-                            )),
-                  );
-                },
-                isDarkMode,
-              ),
-            ],
-          ),
-          const SizedBox(height: 20.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildQuickAccessButton(
-                'Profile',
-                Icons.person_outline,
-                () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const ProfileScreen()),
-                  );
-                },
-                isDarkMode,
-              ),
-              _buildQuickAccessButton(
-                'Settings',
-                Icons.settings,
-                () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SettingsScreen()),
-                  );
-                },
-                isDarkMode,
-              ),
-            ],
-          ),
+          _buildQuickAccessButton('Create Diet Plan', Icons.add_circle, () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => UserFormScreen()),
+            );
+          }, isDarkMode),
+          _buildQuickAccessButton('View Diet Plan', Icons.list, () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => DietMenuScreen(
+                        dietPlan: [],
+                      )),
+            );
+          }, isDarkMode),
+          _buildQuickAccessButton('Profile', Icons.person_outline, () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ProfileScreen()),
+            );
+          }, isDarkMode),
+          _buildQuickAccessButton('Settings', Icons.settings, () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => SettingsScreen()),
+            );
+          }, isDarkMode),
         ],
       ),
     );
@@ -266,34 +210,45 @@ class DashboardPage extends StatelessWidget {
       String label, IconData icon, VoidCallback onTap, bool isDarkMode) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        backgroundColor:
-            isDarkMode ? Colors.grey[700] : const Color(0xFF7ED957),
-        foregroundColor: isDarkMode ? Colors.greenAccent : Colors.black54,
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+        elevation: 5.0,
+        backgroundColor: isDarkMode ? Colors.grey[800] : Colors.white,
+        shadowColor: Colors.black45,
         shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+        padding: const EdgeInsets.all(20.0),
       ),
       onPressed: onTap,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon,
               size: 40.0,
-              color: isDarkMode ? Colors.greenAccent : Colors.black54),
+              color: isDarkMode ? Colors.greenAccent : const Color(0xFF7ED957)),
           const SizedBox(height: 10.0),
           Text(
             label,
-            style: const TextStyle(fontSize: 16.0),
+            style: TextStyle(
+              fontSize: 16.0,
+              color: isDarkMode ? Colors.white70 : Colors.black87,
+            ),
           ),
         ],
       ),
     );
   }
 
-  // Mock method to represent fetching user data
+  String _getTips(String userObjective) {
+    switch (userObjective) {
+      case 'muscle gain':
+        return 'Focus on high-protein foods and strength training.';
+      case 'weight loss':
+        return 'Choose whole foods and control portions.';
+      default:
+        return 'Stay active and maintain balance!';
+    }
+  }
+
   Map<String, dynamic> getUserData() {
-    // Replace with actual data fetching logic
-    return {
-      'objective': 'weight loss', // Example user objective
-    };
+    return {'objective': 'weight loss'}; // Mock data
   }
 }
