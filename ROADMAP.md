@@ -29,8 +29,10 @@ This roadmap outlines the planned features and enhancements for the Nutra Fit Di
 
 ## Future Releases
 
-- [ ] Multi-language Support
-- [ ] AI-based Diet Recommendations
-- [ ] Integration with Wearable Devices (e.g., Fitbit)
-- [ ] Community and Social Features (Share Meal Plans, Recipes)
+- [ ] Addition of new modules will be done
+- [ ] Sample size of genetic algorithm can be increased to give better results but at the
+      expense of computing power.
+- [ ] The keeping track of user’s physical health will be done in this application.
+- [ ] The more precise categorization of population will be done to enhance the meal
+      allocation process.
 ```
