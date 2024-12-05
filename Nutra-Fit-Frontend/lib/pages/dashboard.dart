@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:login_flask/pages/userDetails.dart';
 import 'package:login_flask/templates/UserForm.dart';
 import 'package:provider/provider.dart';
 import '../theme/theme_provider.dart';
@@ -7,6 +8,25 @@ import 'diet_form.dart';
 import 'diet_menu_screen.dart';
 import 'profile_page.dart';
 import 'settings.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:provider/provider.dart';
+
+class UserProvider with ChangeNotifier {
+  String _userId = '';
+
+  String get userId => _userId;
+
+  void setUserId(String id) {
+    _userId = id;
+    notifyListeners();
+  }
+}
+
+// Fetching the userId from the provider
+String getUserId(BuildContext context) {
+  return Provider.of<UserProvider>(context).userId;
+}
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
@@ -174,19 +194,16 @@ class DashboardPage extends StatelessWidget {
         crossAxisSpacing: 12.0,
         mainAxisSpacing: 12.0,
         children: [
-          _buildQuickAccessButton('Create Diet Plan', Icons.add_circle, () {
+          _buildQuickAccessButton('Calculate Diet Plan', Icons.add_circle, () {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => UserFormScreen()),
             );
           }, isDarkMode),
-          _buildQuickAccessButton('View Diet Plan', Icons.list, () {
+          _buildQuickAccessButton('Save User Details', Icons.list, () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (context) => DietMenuScreen(
-                        dietPlan: [],
-                      )),
+              MaterialPageRoute(builder: (context) => ProfileScreen()),
             );
           }, isDarkMode),
           _buildQuickAccessButton('Profile', Icons.person_outline, () {

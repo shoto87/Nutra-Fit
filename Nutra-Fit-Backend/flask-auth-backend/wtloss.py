@@ -42,7 +42,7 @@ def wtloss(wt, ht, gender, age, work):
     recipe_df = pd.read_excel(recipe_file)
 
     # Select relevant columns: recipe name, protein (column 6), fats (column 4), and carbs (column 5)
-    recipes_df = recipe_df[['Recipe Name', recipe_df.columns[7], recipe_df.columns[3], recipe_df.columns[6]]]
+    recipes_df = recipe_df[['Recipe Name', recipe_df.columns[6], recipe_df.columns[3], recipe_df.columns[5]]]
     recipes_df.columns = ['recipe_name', 'protein', 'fats', 'carbs']
 
     # Extract nutrient data

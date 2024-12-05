@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:login_flask/pages/dashboard.dart';
 import 'dart:convert';
 
 import 'package:login_flask/templates/RecipesPage.dart';
@@ -108,6 +109,22 @@ class _ObjectiveSelectionScreenState extends State<ObjectiveSelectionScreen> {
                   Colors.blue.shade400,
                   () => fetchRecipes('weight-maintenance'),
                 ),
+                const SizedBox(height: 20),
+                _buildObjectiveButton(
+                  context,
+                  'Home',
+                  Icons.home,
+                  Colors.teal.shade900,
+                  () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            DashboardPage(), // Use MaterialPageRoute to navigate
+                      ),
+                    );
+                  },
+                )
               ],
             ),
           ),

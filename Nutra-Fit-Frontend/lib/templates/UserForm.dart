@@ -72,20 +72,24 @@ class _UserFormScreenState extends State<UserFormScreen> {
 
   Future<void> submitForm() async {
     if (_formKey.currentState!.validate()) {
+      // Collect data from the form
+      final userData = {
+        'weight': double.parse(weightController.text),
+        'height': double.parse(heightController.text),
+        'age': int.parse(ageController.text),
+        'gender': gender,
+        'work': work,
+      };
+
+      // Submit data to the server
       final response = await http.post(
         Uri.parse('http://127.0.0.1:5000/submit'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'weight': double.parse(weightController.text),
-          'height': double.parse(heightController.text),
-          'age': int.parse(ageController.text),
-          'gender': gender,
-          'work': work,
-        }),
+        body: json.encode(userData),
       );
 
       if (response.statusCode == 200) {
-        final userData = json.decode(response.body);
+        // On success, pass data to the ObjectiveSelectionScreen
         Navigator.push(
           context,
           MaterialPageRoute(
