@@ -21,7 +21,7 @@ Nutra Fit Diet Planner is a personalized diet management app that helps users cr
 1. **Clone the repository**:
 
    ```bash
-   git clone `https://github.com/shoto87/Nutra-Fit.git`
+   git clone https://github.com/shoto87/Nutra-Fit.git
 
    ```
 
