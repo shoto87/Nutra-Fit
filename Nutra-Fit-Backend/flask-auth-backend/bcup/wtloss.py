@@ -38,7 +38,7 @@ def wtloss(wt, ht, gender, age, work):
     target_vector = np.array([P, F, C])
 
     # Load the recipe data
-    recipe_file = r'/home/pratik/dummy/Nutra-Fit/Nutra-Fit-Backend/flask-auth-backend/recipe_nutrient_matrix.xlsx'
+    recipe_file = r'/home/pratik/NUTRA-FIT/BACKEND/recipe_nutrient_matrix.xlsx'
     recipe_df = pd.read_excel(recipe_file)
 
     # Select relevant columns: recipe name, protein (column 6), fats (column 4), and carbs (column 5)
@@ -49,9 +49,9 @@ def wtloss(wt, ht, gender, age, work):
     nutrients = recipes_df[['protein', 'fats', 'carbs']].values
 
     # Genetic Algorithm parameters
-    population_size = 50
-    num_generations = 4
-    mutation_rate = 0.2
+    population_size = 5
+    num_generations = 10
+    mutation_rate = 0.01
 
     # Run the genetic algorithm
     best_recipes = genetic_algorithm(recipes_df, target_vector, nutrients, population_size, num_generations, mutation_rate)

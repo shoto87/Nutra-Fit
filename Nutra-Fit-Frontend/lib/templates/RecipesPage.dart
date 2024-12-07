@@ -7,6 +7,18 @@ class RecipesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Group recipes into days
+    final daysOfWeek = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday'
+    ];
+    final dayWiseRecipes = _divideRecipesByDays(recipes, daysOfWeek.length);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Recipes'),
@@ -45,9 +57,10 @@ class RecipesPage extends StatelessWidget {
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Available Recipes',
+                    'Weekly Recipes',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -55,63 +68,28 @@ class RecipesPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  Table(
-                    border: TableBorder.all(
-                      color: Colors.grey.shade400,
-                      width: 1,
-                    ),
-                    columnWidths: {
-                      0: const FlexColumnWidth(3),
-                      1: const FlexColumnWidth(1),
-                      2: const FlexColumnWidth(1),
-                      3: const FlexColumnWidth(1),
-                    },
-                    children: [
-                      TableRow(
-                        decoration: BoxDecoration(
-                          color: Colors.green.shade100,
-                        ),
-                        children: [
-                          _buildTableHeaderCell('Recipe Name'),
-                          _buildTableHeaderCell('Protein (g)'),
-                          _buildTableHeaderCell('Fats (g)'),
-                          _buildTableHeaderCell('Carbs (g)'),
-                        ],
-                      ),
-                      // Generate table rows for recipes
-                      for (var recipe in recipes)
-                        TableRow(
-                          decoration: BoxDecoration(
-                            color: recipes.indexOf(recipe) % 2 == 0
-                                ? Colors.grey.shade200
-                                : Colors.grey.shade50,
-                          ),
-                          children: [
-                            _buildTableCell(recipe['recipe_name'] ?? 'No Name'),
-                            _buildTableCell(
-                                recipe['protein']?.toString() ?? 'N/A'),
-                            _buildTableCell(
-                                recipe['fats']?.toString() ?? 'N/A'),
-                            _buildTableCell(
-                                recipe['carbs']?.toString() ?? 'N/A'),
-                          ],
-                        ),
-                    ],
-                  ),
+                  ...List.generate(daysOfWeek.length, (index) {
+                    return _buildDaySection(
+                      daysOfWeek[index],
+                      dayWiseRecipes[index],
+                    );
+                  }),
                   const SizedBox(height: 20),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: const Icon(Icons.arrow_back),
-                    label: const Text('Go Back'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green.shade700,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 12, horizontal: 20),
-                      textStyle: const TextStyle(fontSize: 18),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                  Center(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: const Icon(Icons.arrow_back),
+                      label: const Text('Go Back'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green.shade700,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12, horizontal: 20),
+                        textStyle: const TextStyle(fontSize: 18),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
                     ),
                   ),
@@ -119,6 +97,72 @@ class RecipesPage extends StatelessWidget {
               ),
             ),
     );
+  }
+
+  Widget _buildDaySection(String day, List<dynamic> recipes) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          day,
+          style: const TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Colors.green,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Table(
+          border: TableBorder.all(
+            color: Colors.grey.shade400,
+            width: 1,
+          ),
+          columnWidths: {
+            0: const FlexColumnWidth(3),
+            1: const FlexColumnWidth(1),
+            2: const FlexColumnWidth(1),
+            3: const FlexColumnWidth(1),
+          },
+          children: [
+            TableRow(
+              decoration: BoxDecoration(
+                color: Colors.green.shade100,
+              ),
+              children: [
+                _buildTableHeaderCell('Recipe Name'),
+                _buildTableHeaderCell('Protein (g)'),
+                _buildTableHeaderCell('Fats (g)'),
+                _buildTableHeaderCell('Carbs (g)'),
+              ],
+            ),
+            ...recipes.map((recipe) {
+              return TableRow(
+                decoration: BoxDecoration(
+                  color: recipes.indexOf(recipe) % 2 == 0
+                      ? Colors.grey.shade200
+                      : Colors.grey.shade50,
+                ),
+                children: [
+                  _buildTableCell(recipe['recipe_name'] ?? 'No Name'),
+                  _buildTableCell(recipe['protein']?.toString() ?? 'N/A'),
+                  _buildTableCell(recipe['fats']?.toString() ?? 'N/A'),
+                  _buildTableCell(recipe['carbs']?.toString() ?? 'N/A'),
+                ],
+              );
+            }).toList(),
+          ],
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  List<List<dynamic>> _divideRecipesByDays(List<dynamic> recipes, int numDays) {
+    List<List<dynamic>> dayWiseRecipes = List.generate(numDays, (_) => []);
+    for (int i = 0; i < recipes.length; i++) {
+      dayWiseRecipes[i % numDays].add(recipes[i]);
+    }
+    return dayWiseRecipes;
   }
 
   Widget _buildTableHeaderCell(String text) {

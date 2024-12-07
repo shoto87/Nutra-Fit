@@ -12,7 +12,8 @@ def generate_population(recipes_df, population_size):
 
 # Fitness function
 def fitness_function(individual, nutrients, target_vector):
-    combined_vector = np.sum(nutrients[individual], axis=0)
+    # Index the nutrient data properly using individual as a list of indices
+    combined_vector = np.sum(nutrients[individual, :], axis=0)
     distance = np.linalg.norm(combined_vector - target_vector)
 
     # Ensure that the distance is finite, replace with a large number if it's not
@@ -65,9 +66,6 @@ def genetic_algorithm(recipes_df, target_vector, nutrients, population_size, num
     for generation in range(num_generations):
         fitness_scores = [fitness_function(ind, nutrients, target_vector) for ind in population]
         
-        # Debug: Print out fitness scores to see if there are any issues
-        #print(f"Generation {generation} Fitness Scores: {fitness_scores}")
-        
         parents = select_parents(population, fitness_scores)
         next_generation = []
 
@@ -87,7 +85,17 @@ def genetic_algorithm(recipes_df, target_vector, nutrients, population_size, num
 
         population = next_generation
 
-    # Identify the best individual after all generations
-    best_individual = max(population, key=lambda ind: fitness_function(ind, nutrients, target_vector))
-    best_recipes = recipes_df.iloc[best_individual]
-    return best_recipes
+    # Identify the top 3 individuals after all generations
+    sorted_population = sorted(population, key=lambda ind: fitness_function(ind, nutrients, target_vector), reverse=True)
+    top_individuals = sorted_population[:7]  # Get the best 3 individuals
+
+    # Collect recipes from the top 3 individuals into a DataFrame
+    best_recipes_list = []
+    for individual in top_individuals:
+        # Use the index list to extract recipe data
+        best_recipes_list.append(recipes_df.loc[individual])
+
+    # Combine the top 3 individual recipes into one DataFrame (no deduplication)
+    best_recipes = pd.concat(best_recipes_list)
+
+    return best_recipes  # Return the best recipes as a DataFrame

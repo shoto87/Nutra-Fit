@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       title: 'Nutra Fit Diet Planner',
-      theme: themeProvider.themeData, // Global theme application
+      theme: themeProvider.themeData,
       initialRoute: '/login',
       routes: {
         '/login': (context) => LoginPage(),

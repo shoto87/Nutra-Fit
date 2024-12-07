@@ -4,6 +4,10 @@ import 'dart:convert';
 
 import 'package:login_flask/templates/ObjectiveSelectionScreen.dart';
 
+void main() {
+  runApp(UserForm());
+}
+
 class UserForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
